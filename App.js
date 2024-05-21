@@ -1,142 +1,10 @@
-// import React, { useState ,useEffect} from 'react';
-// import { StyleSheet, Text, View, TouchableOpacity, Button } from 'react-native';
-// import axios from 'axios';
-
-// const QuizApp = () => {
-//   const [selectedOption, setSelectedOption] = useState(null);
-//   const [showAnswer, setShowAnswer] = useState(false);
-
-//   const question = "What is the capital of France?";
-//   const options = ["Berlin", "Madrid", "Paris", "Rome"];
-//   const correctOption = 2;
-//   const explanation = "Paris is the capital city of France.";
-
-//   const handleOptionPress = (index) => {
-//     setSelectedOption(index);
-//   };
-
-//   const handleSubmit = async() => {
-//     setShowAnswer(true);
-//   };
-
-//   const handleShowAnswer = () => {
-//     setShowAnswer(true);
-//   };
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-
-//         const response = await axios.get(`http://localhost:8080/api/mcq/questions`);
-//         console.log(response.data)
-
-//       } catch (error) {
-//         console.log("Error fetching user details:", error);
-//       }
-//     };
-
-//     fetchData();
-
-//     return () => {
-//       setUserData(null);
-//     };
-//   }, []);
-
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.question}>{question}</Text>
-//       {options.map((option, index) => (
-//         <TouchableOpacity
-//           key={index}
-//           style={[
-//             styles.optionButton,
-//             selectedOption === index && !showAnswer && styles.selectedOption,
-//             showAnswer && index === correctOption && styles.correctOption,
-//             showAnswer && selectedOption === index && selectedOption !== correctOption && styles.incorrectOption,
-//           ]}
-//           onPress={() => handleOptionPress(index)}
-//           disabled={showAnswer}
-//         >
-//           <Text style={styles.optionText}>{option}</Text>
-//         </TouchableOpacity>
-//       ))}
-//       <View style={styles.buttonContainer}>
-//         <Button title="Submit" onPress={handleSubmit} disabled={showAnswer} />
-//       </View>
-//       <View style={styles.buttonContainer}>
-//         <Button title="Show Answer" onPress={handleShowAnswer} />
-//       </View>
-//       {showAnswer && (
-//         <View style={styles.explanationContainer}>
-//           <Text style={styles.explanationTitle}>Explanation:</Text>
-//           <Text style={styles.explanationText}>{explanation}</Text>
-//         </View>
-//       )}
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     padding: 20,
-//     backgroundColor: '#fff',
-//   },
-//   question: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 20,
-//     textAlign: 'center',
-//   },
-//   optionButton: {
-//     backgroundColor: '#f0f0f0',
-//     padding: 15,
-//     borderRadius: 10,
-//     marginVertical: 5,
-//     marginHorizontal: 10, // Margin added to left and right
-//   },
-//   optionText: {
-//     fontSize: 18,
-//     textAlign: 'center',
-//   },
-//   selectedOption: {
-//     backgroundColor: 'purple', // Color for selected option
-//   },
-//   correctOption: {
-//     backgroundColor: 'green',
-//   },
-//   incorrectOption: {
-//     backgroundColor: 'red',
-//   },
-//   buttonContainer: {
-//     marginVertical: 10,
-//     marginHorizontal: 10, // Margin added to left and right for buttons
-//   },
-//   explanationContainer: {
-//     marginTop: 20,
-//     padding: 10,
-//     backgroundColor: '#f9f9f9',
-//     borderRadius: 10,
-//   },
-//   explanationTitle: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//   },
-//   explanationText: {
-//     fontSize: 16,
-//     marginTop: 5,
-//   },
-// });
-
-// export default QuizApp;  
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button } from 'react-native';
 import axios from 'axios';
 
 const QuizApp = () => {
   const [questions, setQuestions] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
@@ -145,8 +13,9 @@ const QuizApp = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/mcq/questions');
+        const response = await axios.get('http://192.168.0.131:8080/api/mcq/questions');
         setQuestions(response.data);
+        setCurrentQuestionIndex(response.data.length - 1); // Set to last index
       } catch (error) {
         console.log("Error fetching questions:", error);
       }
@@ -178,7 +47,7 @@ const QuizApp = () => {
     setSelectedOption(null);
     setIsCorrect(null);
     setCorrectAnswer('');
-    setCurrentQuestionIndex(currentQuestionIndex + 1);
+    setCurrentQuestionIndex(currentQuestionIndex - 1); // Decrement index
   };
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -266,7 +135,6 @@ const QuizApp = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -285,14 +153,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginVertical: 5,
-    marginHorizontal: 10, // Margin added to left and right for options
+    marginHorizontal: 30,
   },
   optionText: {
     fontSize: 18,
     textAlign: 'center',
   },
   selectedOption: {
-    backgroundColor: 'purple', // Color for selected option
+    backgroundColor: 'purple',
   },
   correctOption: {
     backgroundColor: 'green',
@@ -302,7 +170,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginVertical: 10,
-    marginHorizontal: 10, // Margin added to left and right for buttons
+    marginHorizontal: 30,
+    borderCurve: 10
   },
   explanationContainer: {
     marginTop: 20,
@@ -325,13 +194,13 @@ const styles = StyleSheet.create({
   resultText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000', // Adjust color as needed
+    color: '#000',
   },
   correctText: {
-    color: 'green', // Color for correct message
+    color: 'green',
   },
   incorrectText: {
-    color: 'red', // Color for incorrect message
+    color: 'red',
   },
   loadingText: {
     fontSize: 18,
